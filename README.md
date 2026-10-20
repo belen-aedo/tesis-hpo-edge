@@ -36,7 +36,7 @@ La carpeta tiene que estar en una ruta **sin tildes ni espacios** (ejemplo:
 ## 2. Por dónde pasan los datos (y quién ve las etiquetas)
 
 | Etapa                       | Script        | ¿Usa etiquetas? |
-|-----------------------------|---------------|--- -------------|
+|-----------------------------|---------------|------------------|
 | Preprocesar (profesor)      | pasos 00–03   | su `train` mezcla tráfico normal y ataques |
 | Bloques                     | `prepare_splits.py` | solo para separar lo normal de los ataques; **train y val tienen solo tráfico normal** |
 | Selección de variables y escalado | `prepare_splits.py` | **no**: usa solo el train normal |
@@ -126,7 +126,7 @@ python run_all.py --etapas evaluar,reporte
 ## 5. Qué resultados salen y dónde quedan
 
 | Archivo | Contenido |
-|-- -|---|
+|---|---|
 | `data/splits/manifest.json` | tamaños, tipos de ataque de cada bloque y hashes SHA-256 |
 | `data/splits/features.json` | variables elegidas y cuántas se descartaron en cada filtro |
 | `outputs/optuna/*.json` | un estudio por cada detector × métrica × semilla (mejor valor y top-k) |
