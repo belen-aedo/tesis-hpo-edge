@@ -181,8 +181,7 @@ python run_all.py --etapas evaluar,reporte
 | 3.2.11 | Versiones de bibliotecas | `optimize.py` → `write_env` | — |
 | 3.2.11 | Pruebas anti-fuga (datos sintéticos) | `tests/smoke_test.py` | — |
 
-## 7. Limitaciones que hay que declarar en la tesis
-
+## 7. Limitaciones 
 1. El preprocessor del profesor ajusta su MinMax y su imputación con un `train` que **incluye
    ataques** (solo mínimos, máximos y medias de las columnas numéricas). Aquí, después, se vuelve a
    escalar usando solo el train normal.
