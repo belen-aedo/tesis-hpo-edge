@@ -3,8 +3,6 @@
 #  (solo quedan fijas en el codigo algunas semillas y tamanos de muestra internos;
 #   estan listados en la seccion 3.2.11 de la memoria)
 #
-#  Para probar cosas sin tocar este archivo: crea un yaml pequeno con solo las
-#  claves que cambian y pasalo con  --config mi_prueba.yaml  (se mezcla encima).
 # =============================================================================
 
 # ---------------------------------------------------------------- RUTAS ------

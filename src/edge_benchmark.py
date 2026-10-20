@@ -27,8 +27,7 @@ Un modelo cumple si: la latencia (p95 o mediana, segun edge.latency_stat) es men
 que max_latency_ms, cpu_util_at_rate es menor que max_cpu_percent y ram_peak_mb
 es menor que max_ram_mb.
 
-USO (en la Raspberry)
-    python src/edge_benchmark.py
+
 """
 
 from __future__ import annotations
@@ -166,7 +165,7 @@ def main() -> None:
     print(f"Plataforma: {info['device_model']} | {info['cpu_count']} nucleos | "
           f"{info['total_ram_gb']} GB RAM")
     if not info["is_raspberry_pi"]:
-        print("[!] AVISO: este equipo NO es una Raspberry Pi. Los resultados sirven para "
+        print(" Los resultados sirven para "
               "probar el flujo, no para reportar costo en el borde.")
     check_env(cfg)
 

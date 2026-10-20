@@ -2,7 +2,7 @@
 search_space.py - espacios de busqueda de cada detector, y un `trial` aleatorio
 que se usa igual que el de Optuna (lo ocupan diagnose.py y las pruebas).
 
-Cambios respecto del informe inicial (hay que declararlos en el capitulo 3):
+Cambios respecto del informe inicial :
   * `contamination` ya no se busca: el umbral es un percentil q fijo.
   * iForest `max_samples`: ahora es un numero de filas por arbol (no una
     fraccion), buscado en escala logaritmica entre 64 y 4096 (Liu et al.

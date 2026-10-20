@@ -1,5 +1,5 @@
 """
-prepare_splits.py - Etapa 1: toma la salida del preprocessor del profesor y arma
+prepare_splits.py - Etapa 1: toma la salida del preprocessor y arma
 los bloques del experimento (los 3 bloques del diagrama aprobado).
 
     train : solo trafico normal, sin etiquetas
@@ -26,8 +26,6 @@ El resto de la cadena no usa etiquetas
     train normal (varianza/frecuencia y correlacion). No mira etiquetas.
   * Reescalado (scaling.method = standard): media y desviacion del train normal.
     Las columnas 0/1 (one-hot) se dejan igual.
-  Ojo: el paso 04 del profesor (features.mode = selector) usa etiquetas (salvo
-  `vif`). Se puede usar, pero hay que declararlo como limitacion.
 
 USO
     python src/prepare_splits.py
@@ -333,13 +331,13 @@ def main() -> None:
         print(f"  {k:12s}: {v['rows']:>8,} filas{extra}")
     ratio = manifest["splits"]["test_final"]["attack_ratio"]
     if ratio > 0.5:
-        print(f"\n[!] AVISO: {ratio:.0%} de test_final es ataque. Con esa prevalencia la Precision "
+        print(f"\n {ratio:.0%} de test_final es ataque. Con esa prevalencia la Precision "
               "es enganosamente alta y el MCC no representa un despliegue real. Use "
               "split.test_target_prevalence (p. ej. 0.10) o mire MCC_pi05 / MCC_pi10.")
     if manifest["splits"]["test_oracle"]["normal"] < 300:
-        print("[!] AVISO: pocos normales en test_oracle: el FPR estimado sera ruidoso.")
+        print("pocos normales en test_oracle: el FPR estimado sera ruidoso.")
     if len(X_val) < 1000:
-        print("[!] AVISO: val tiene menos de 1000 filas: umbral y metricas ruidosos. "
+        print("+val tiene menos de 1000 filas: umbral y metricas ruidosos. "
               "Considere input.variant: processed.")
 
 

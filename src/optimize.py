@@ -65,7 +65,7 @@ def measure_latency_ms(det, X: np.ndarray, n: int) -> float:
     """Mediana de la latencia por muestra, pasando de a una muestra (como llegaria
     un flujo real)."""
     n = min(n, len(X))
-    for i in range(min(3, n)):                      # pasadas de calentamiento (no se miden)
+    for i in range(min(3, n)):                      
         det.scores(X[i:i + 1])
     t = np.empty(n)
     for i in range(n):
