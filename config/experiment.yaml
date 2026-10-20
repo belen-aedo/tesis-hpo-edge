@@ -1,0 +1,111 @@
+# =============================================================================
+#  experiment.yaml  -  UNICA fuente de configuracion del proyecto
+#  (solo quedan fijas en el codigo algunas semillas y tamanos de muestra internos;
+#   estan listados en la seccion 3.2.11 de la memoria)
+#
+#  Para probar cosas sin tocar este archivo: crea un yaml pequeno con solo las
+#  claves que cambian y pasalo con  --config mi_prueba.yaml  (se mezcla encima).
+# =============================================================================
+
+# ---------------------------------------------------------------- RUTAS ------
+paths:
+  # Carpeta "Datasets" donde el preprocessor del profesor deja Parquet/<dataset>/.
+  # Relativa a esta carpeta del proyecto, o absoluta (p. ej. si prefieres seguir
+  # usando la de antes:  C:/Users/belen/Desktop/Taller de investigacion/Datasets)
+  datasets_root: Datasets
+  splits_dir: data/splits        # bloques train / val / test (los crea prepare_splits.py)
+  outputs_dir: outputs           # modelos, estudios Optuna, resultados, tablas
+
+# -------------------------------------------------------------- DATASET ------
+dataset:
+  name: Ton-IoT                  # nombre de la carpeta en Datasets/Parquet/
+  label_col: category            # columna binaria que deja el preprocessor
+  normal_value: 0                # valor de label_col que significa "trafico normal"
+  attack_type_col: type          # tipo de ataque (solo para reportar recall por tipo)
+  drop_cols: [category, label, type]   # nunca son caracteristicas
+
+# ---------------------------------------------- QUE SALIDA DEL PROFESOR USAR --
+input:
+  # stratified = muestra del 10 % (rapida, para desarrollar)
+  # processed  = dataset completo (para la corrida final de la tesis)
+  variant: processed
+
+features:
+  # unsupervised = seleccion SIN etiquetas hecha aqui, solo con trafico normal (recomendado)
+  # selector     = usa las columnas que eligio el paso 04 del profesor (usa etiquetas, salvo vif)
+  # all          = todas las columnas numericas que deja el preprocessor
+  mode: unsupervised
+  selector: vif                  # solo si mode = selector: vif | l1_lasso | f_classif | ...
+  max_features: 40               # tope de caracteristicas (menos = mas liviano en el borde)
+  min_minority_freq: 0.001       # una columna 0/1 debe valer 1 (o 0) en >= 0,1 % del trafico normal
+  max_abs_corr: 0.95             # de dos columnas con |correlacion| mayor, se descarta una
+
+scaling:
+  # standard = (x - media) / desv. con estadisticos del TRAIN NORMAL, solo en columnas
+  #            no binarias (las 0/1 quedan como estan). none = sin reescalar.
+  method: standard
+  clip: 10.0                     # recorta |z| a este valor (estabiliza AE/LOF); null = sin recorte
+
+# ----------------------------------------------------------- PARTICIONES ----
+split:
+  seed: 42
+  # El train del preprocessor tiene normal + ataque: aqui SOLO se usa su trafico normal
+  # (one-class). De ese normal, esta fraccion pasa a `val`; el resto es `train`.
+  val_frac_of_normal: 0.15
+  # El test del preprocessor (normal + ataque) es el bloque de prueba. Ver `oracle`.
+  oracle_frac_of_test: 0.5       # parte del test para el oraculo; el resto = test_final
+  # null = prevalencia natural del test; 0.10 = se submuestrean ataques hasta 10 %
+  test_target_prevalence: null
+  report_prevalences: [0.05, 0.10]   # MCC ajustado a estas prevalencias (solo reporte)
+  edge_sample_rows: 2000         # filas de val (sin etiquetas) que viajan a la Raspberry
+
+# ------------------------------------------------------------- UMBRAL --------
+threshold:
+  q: 0.95                        # percentil de calibracion = falsas alarmas objetivo 5 %
+  calib_frac: 0.5                # mitad de `val` calibra el umbral, la otra mitad es el objetivo
+  sensitivity_q: [0.90, 0.95, 0.99]    # solo se REPORTAN, nunca se usan para elegir
+  oracle_q_range: [0.80, 0.999]  # rango de q en el oraculo "oracle_q"
+
+# -------------------------------------------------- DETECTORES Y METRICAS ----
+detectors:                       # criterio no supervisado que se optimiza en cada uno
+  iforest: [silhouette, davies_bouldin]
+  lof: [silhouette, davies_bouldin]
+  autoencoder: [reconstruction, stability]
+  # criterios disponibles: silhouette, davies_bouldin, reconstruction, stability, consistency
+
+search_space:
+  iforest_max_samples: absolute  # absolute (64..4096 filas/arbol) | fraction (0.1..1.0)
+
+autoencoder:
+  backend: auto                  # auto (Keras si hay TensorFlow, si no scikit-learn) | keras | sklearn
+
+objectives:
+  stability_replicas: 10
+  stability_noise_sigma: 0.01    # en unidades estandarizadas
+
+# ------------------------------------------------------- OPTIMIZACION -------
+optimization:
+  n_trials: 100
+  seeds: [42, 43, 44,45,46]
+  top_k: 5                       # configuraciones por busqueda que se miden en la Raspberry
+  oracle: true                   # tambien correr el escenario oraculo (cota superior)
+  oracle_prevalence: null        # null = MCC crudo; 0.10 = MCC ajustado a 10 % de ataques
+  max_train_rows: 10000           # tope de filas de train (null = todas)
+  max_train_rows_lof: 20000      # LOF guarda todo el train en RAM: se acota
+  max_val_rows: null
+  silhouette_sample: 5000
+  consistency_boot: 3
+  consistency_frac: 0.7
+  latency_samples: 50
+
+# ------------------------------------------------------------- BORDE ---------
+edge:
+  max_latency_ms: 100.0          # latencia por flujo (lote de 1)
+  latency_stat: p95              # median | p95
+  max_cpu_percent: 50.0          # % de la CPU TOTAL al ritmo flow_rate_per_s
+  flow_rate_per_s: 100.0         # flujos por segundo que debe sostener el dispositivo
+  max_ram_mb: 512.0
+  max_model_kb: 51200.0          # 50 MB
+  n_inference_runs: 1000
+  n_warmup_runs: 20
+  dev_slowdown_factor: 5.0       # la Pi 5 se supone ~5x mas lenta que el PC de desarrollo

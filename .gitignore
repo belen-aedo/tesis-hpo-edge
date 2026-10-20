@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv*/
+data/splits/*
+!data/splits/.gitkeep
+outputs/*
+!outputs/.gitkeep
+Datasets/Parquet/*
+Datasets/Sources/TON-IoT/Train_Test_datasets/Train_Test_Network_dataset/*.csv
+preprocessor/
+outputs_antes/

@@ -1,0 +1,14 @@
+# PC (entrenamiento / optimizacion). Python 3.10 o superior.
+numpy>=1.24
+pandas>=2.2          # el paso 03 del profesor usa groupby.apply(include_groups=False)
+scipy>=1.10
+scikit-learn>=1.3
+pyyaml>=6.0
+psutil>=5.9
+optuna>=3.4
+pyarrow>=14          # lectura/escritura de Parquet (el preprocessor lo necesita)
+
+# Opcionales
+# tensorflow>=2.13   # autoencoder con Keras (si no esta, se usa scikit-learn)
+# lightgbm           # solo si features.mode: selector (paso 04 del profesor)
+# statsmodels        # idem (VIF)

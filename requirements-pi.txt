@@ -1,0 +1,9 @@
+# Raspberry Pi 5 (solo INFERENCIA y medicion). Sin tensorflow, optuna ni pyarrow.
+# scikit-learn y numpy: instale la MISMA version que en el PC (vea outputs/models/env.json),
+# por ejemplo:  pip install scikit-learn==1.7.2 numpy==2.2.6
+numpy
+pandas
+scipy
+scikit-learn
+pyyaml
+psutil
